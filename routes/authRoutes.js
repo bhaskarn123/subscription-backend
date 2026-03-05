@@ -21,14 +21,14 @@ router.post(
     }
 
     try {
-      const { email, password } = req.body;
+      const { name,email, password } = req.body;
       const [existing] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
       if (existing.length > 0) {
         return res.status(HTTP.BAD_REQUEST).json({ success: false, message: "User already exists" });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      const [result] = await db.query("INSERT INTO users (email, password) VALUES (?, ?)", [email, hashedPassword]);
+      const [result] = await db.query("INSERT INTO users (name ,email, password) VALUES (?, ?, ?)", [email, hashedPassword]);
 
       // Generate token immediately after registration
       const token = jwt.sign({ userId: result.insertId, email }, process.env.JWT_SECRET, { expiresIn: "1h" });
@@ -40,7 +40,7 @@ router.post(
       });
     } catch (error) {
       console.error("REGISTER ERROR:", error.message);
-      res.status(HTTP.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server Error" });
+      res.status(HTTP.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message || "Server Error" });
     }
   }
 );

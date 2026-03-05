@@ -28,7 +28,7 @@ router.post(
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      const [result] = await db.query("INSERT INTO users (name ,email, password) VALUES (?, ?, ?)", [email, hashedPassword]);
+      const [result] = await db.query("INSERT INTO users (name ,email, password) VALUES (?, ?, ?)", [name, email, hashedPassword]);
 
       // Generate token immediately after registration
       const token = jwt.sign({ userId: result.insertId, email }, process.env.JWT_SECRET, { expiresIn: "1h" });
